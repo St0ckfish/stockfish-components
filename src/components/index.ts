@@ -1,2 +1,4 @@
 import TextEditor from "./TextEditor";
-export { TextEditor };
+import TimeTable from "./TimeTable";
+
+export { TextEditor, TimeTable };
