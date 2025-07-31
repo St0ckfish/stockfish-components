@@ -1,0 +1,58 @@
+{
+  "name": "stockfish-components",
+  "version": "1.0.1",
+  "description": "A reusable React component library using Tailwind CSS and TypeScript.",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "style": "dist/index.css",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.js"
+    },
+    "./style.css": "./dist/index.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c --watch",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "pnpm run build"
+  },
+  "keywords": [
+    "react",
+    "tailwind",
+    "typescript",
+    "component-library"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "packageManager": "pnpm@10.6.1",
+  "dependencies": {
+    "react-icons": "^5.5.0",
+    "tailwind-merge": "^3.3.1",
+    "tailwind-scrollbar-hide": "^4.0.0",
+    "tailwindcss": "^3.4.17",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "^5.8.3"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.23",
+    "@types/react-dom": "^18.3.7",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "rollup": "^4.46.2",
+    "rollup-plugin-postcss": "^4.0.2",
+    "rollup-plugin-typescript2": "^0.36.0",
+    "tslib": "^2.8.1"
+  }
+}
