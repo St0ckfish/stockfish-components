@@ -187,7 +187,6 @@ const TimeTable: React.FC<TimeTableProps> = ({
       <div className={`w-full overflow-x-auto ${compact ? 'mb-4' : 'mb-20'}`}>
         <div className="grid w-full overflow-x-auto">
           <div className={`mx-3 rounded-xl ${themeClasses.container} p-6 min-w-[1200px] overflow-hidden shadow-lg border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-            {/* Day headers */}
             <div className="flex justify-between mb-4">
               <div className={`${compact ? 'w-16' : 'w-20'} flex items-center justify-center`}>
                 <span className="text-sm font-medium opacity-60">Time</span>
@@ -205,9 +204,7 @@ const TimeTable: React.FC<TimeTableProps> = ({
               ))}
             </div>
 
-            {/* Time slots and events */}
             <div className={`relative mt-4 flex ${compact ? 'h-[800px]' : 'h-[1000px]'}`}>
-              {/* Time labels */}
               <div className="flex flex-col">
                 {timeSlots.map((time, idx) => (
                   <div
@@ -220,9 +217,7 @@ const TimeTable: React.FC<TimeTableProps> = ({
                 ))}
               </div>
 
-              {/* Grid and events container */}
               <div className="relative flex flex-1">
-                {/* Horizontal grid lines */}
                 <div className="absolute inset-0">
                   {timeSlots.map((_, idx) => (
                     <div
@@ -233,7 +228,6 @@ const TimeTable: React.FC<TimeTableProps> = ({
                   ))}
                 </div>
 
-                {/* Days columns with events */}
                 {days.map((day) => {
                   const dayEvents = scheduleData.filter((event) =>
                     event.day.toUpperCase().startsWith(day.name.toUpperCase()),
@@ -282,7 +276,6 @@ const TimeTable: React.FC<TimeTableProps> = ({
                               onClick={() => onEventClick?.(event)}
                               title={event.description || `${event.courseName} - ${event.classroomName}`}
                             >
-                              {/* Actions button */}
                               {showActions && (
                                 <div className="absolute -right-1 -top-1 flex items-center gap-1">
                                   <button
@@ -312,7 +305,6 @@ const TimeTable: React.FC<TimeTableProps> = ({
                                 </div>
                               )}
 
-                              {/* Event content */}
                               <div className="mb-1 flex flex-col items-start leading-tight space-y-1">
                                 <span className={`font-semibold ${fontSize} truncate w-full block`}>
                                   {event.courseName}
@@ -337,7 +329,6 @@ const TimeTable: React.FC<TimeTableProps> = ({
                                 )}
                               </div>
 
-                              {/* Overlap warning */}
                               {hasOverlap && showOverlapWarning && hoveredEvent === event.id && (
                                 <div className="absolute left-full top-0 ml-2 w-48 rounded-lg bg-white dark:bg-gray-800 p-3 shadow-xl border dark:border-gray-600 z-50">
                                   <div className="text-sm font-semibold text-red-600 dark:text-red-400 mb-2">
@@ -354,7 +345,6 @@ const TimeTable: React.FC<TimeTableProps> = ({
                               )}
                             </div>
 
-                            {/* Action dropdown */}
                             {dropdownOpenId === event.id && showActions && (
                               <div
                                 ref={(el) => {
@@ -404,7 +394,6 @@ const TimeTable: React.FC<TimeTableProps> = ({
               </div>
             </div>
 
-            {/* Timezone info */}
             {timezone && (
               <div className="mt-4 text-xs opacity-60 text-center">
                 Timezone: {timezone}
