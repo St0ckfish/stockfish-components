@@ -1,6 +1,6 @@
 {
   "name": "stockfish-components",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A reusable React component library using Tailwind CSS and TypeScript.",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -35,7 +35,7 @@
   "packageManager": "pnpm@10.6.1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/St0ckfish/stockfish-components.git"
+    "url": "git+https://github.com/St0ckfish/stockfish-components.git"
   },
   "homepage": "https://www.npmjs.com/package/stockfish-components",
   "dependencies": {

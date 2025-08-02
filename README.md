@@ -41,6 +41,8 @@ If you're using a bundler that doesn't support CSS imports, make sure to include
 
 ```css
 /* In your main CSS file */
+@import 'stockfish-components/style.css';
+# or
 @import 'stockfish-components/dist/index.css';
 ```
 

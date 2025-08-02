@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { AiOutlineClockCircle } from "react-icons/ai";
 import { FaChalkboardTeacher, FaEdit, FaTrash } from "react-icons/fa";
+import { cn } from "../lib/utils";
 
 interface Schedule {
   id: number;
@@ -183,33 +184,33 @@ const TimeTable: React.FC<TimeTableProps> = ({
   };
 
   return (
-    <div className={`stockfish-components ${className}`}>
-      <div className={`w-full overflow-x-auto ${compact ? 'mb-4' : 'mb-20'}`}>
+    <div className={cn("stockfish-components", className)}>
+      <div className={cn("w-full overflow-x-auto", compact ? "mb-4" : "mb-20")}>
         <div className="grid w-full overflow-x-auto">
-          <div className={`mx-3 rounded-xl ${themeClasses.container} p-6 min-w-[1200px] overflow-hidden shadow-lg border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
+          <div className={cn("mx-3 rounded-xl p-6 min-w-[1200px] overflow-hidden shadow-lg border", themeClasses.container, theme === 'dark' ? 'border-gray-700' : 'border-gray-200')}>
             <div className="flex justify-between mb-4">
-              <div className={`${compact ? 'w-16' : 'w-20'} flex items-center justify-center`}>
+              <div className={cn(compact ? 'w-16' : 'w-20', "flex items-center justify-center")}>
                 <span className="text-sm font-medium opacity-60">Time</span>
               </div>
               {days.map((day) => (
                 <div
                   key={day.id}
-                  className={`${compact ? 'w-16 px-2 py-1' : 'w-20 px-4 py-2'} rounded-lg ${themeClasses.dayHeader} text-center shadow-sm transition-all duration-200 hover:shadow-md`}
+                  className={cn(compact ? 'w-16 px-2 py-1' : 'w-20 px-4 py-2', "rounded-lg text-center shadow-sm transition-all duration-200 hover:shadow-md", themeClasses.dayHeader)}
                   title={day.fullName}
                 >
-                  <div className={`font-semibold ${compact ? 'text-xs' : 'text-sm'}`}>
+                  <div className={cn("font-semibold", compact ? 'text-xs' : 'text-sm')}>
                     {day.name}
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className={`relative mt-4 flex ${compact ? 'h-[800px]' : 'h-[1000px]'}`}>
+            <div className={cn("relative mt-4 flex", compact ? 'h-[800px]' : 'h-[1000px]')}>
               <div className="flex flex-col">
                 {timeSlots.map((time, idx) => (
                   <div
                     key={idx}
-                    className={`${compact ? 'h-20' : 'h-[100px]'} pr-4 text-right font-medium text-sm opacity-75 flex items-start justify-end`}
+                    className={cn(compact ? 'h-20' : 'h-[100px]', "pr-4 text-right font-medium text-sm opacity-75 flex items-start justify-end")}
                     style={{ paddingTop: compact ? '8px' : '12px' }}
                   >
                     {time}
@@ -222,7 +223,7 @@ const TimeTable: React.FC<TimeTableProps> = ({
                   {timeSlots.map((_, idx) => (
                     <div
                       key={idx}
-                      className={`absolute w-full border-t ${themeClasses.gridLine} opacity-30`}
+                      className={cn("absolute w-full border-t opacity-30", themeClasses.gridLine)}
                       style={{ top: `${(idx * 100) / (timeSlots.length - 1)}%` }}
                     />
                   ))}
@@ -236,7 +237,7 @@ const TimeTable: React.FC<TimeTableProps> = ({
                   return (
                     <div
                       key={day.id}
-                      className={`relative flex-1 border-l ${themeClasses.gridLine} transition-all duration-200 hover:bg-opacity-50`}
+                      className={cn("relative flex-1 border-l transition-all duration-200 hover:bg-opacity-50", themeClasses.gridLine)}
                     >
                       {dayEvents.filter(isEventVisible).map((event) => {
                         const top = timeToPosition(event.startTime, startTime, endTime);
@@ -260,11 +261,13 @@ const TimeTable: React.FC<TimeTableProps> = ({
                         return (
                           <React.Fragment key={event.id}>
                             <div
-                              className={`group absolute left-1 right-1 overflow-hidden rounded-lg border-l-4 ${
-                                event.color || getEventColor(event, hasOverlap)
-                              } ${compact ? 'p-2' : duration >= 40 ? 'p-3' : 'p-2'} shadow-sm transition-all duration-200 cursor-pointer ${
-                                hasOverlap ? 'hover:z-40 hover:scale-105' : 'hover:shadow-md'
-                              } ${hoveredEvent === event.id ? 'z-50 scale-105 shadow-lg' : ''}`}
+                              className={cn(
+                                "group absolute left-1 right-1 overflow-hidden rounded-lg border-l-4 shadow-sm transition-all duration-200 cursor-pointer",
+                                event.color || getEventColor(event, hasOverlap),
+                                compact ? 'p-2' : duration >= 40 ? 'p-3' : 'p-2',
+                                hasOverlap ? 'hover:z-40 hover:scale-105' : 'hover:shadow-md',
+                                hoveredEvent === event.id ? 'z-50 scale-105 shadow-lg' : ''
+                              )}
                               style={{
                                 top: `${top}%`,
                                 height: `${Math.max(height, compact ? 8 : 10)}%`,
@@ -306,13 +309,14 @@ const TimeTable: React.FC<TimeTableProps> = ({
                               )}
 
                               <div className="mb-1 flex flex-col items-start leading-tight space-y-1">
-                                <span className={`font-semibold ${fontSize} truncate w-full block`}>
+                                <span className={cn("font-semibold truncate w-full block", fontSize)}>
                                   {event.courseName}
                                 </span>
 
-                                <span className={`flex items-center gap-1 ${
+                                <span className={cn(
+                                  "flex items-center gap-1 opacity-75",
                                   compact ? 'text-xs' : duration >= 60 ? 'text-sm' : duration >= 40 ? 'text-xs' : 'text-xs'
-                                } opacity-75`}>
+                                )}>
                                   <AiOutlineClockCircle className="flex-shrink-0" />
                                   <span className="truncate">
                                     {event.startTime.slice(0, 5)} - {event.endTime.slice(0, 5)}
@@ -320,9 +324,10 @@ const TimeTable: React.FC<TimeTableProps> = ({
                                 </span>
 
                                 {!compact && (
-                                  <span className={`flex items-center gap-1 ${
+                                  <span className={cn(
+                                    "flex items-center gap-1 opacity-75",
                                     duration >= 60 ? 'text-sm' : duration >= 40 ? 'text-xs' : 'text-xs'
-                                  } opacity-75`}>
+                                  )}>
                                     <FaChalkboardTeacher className="flex-shrink-0" />
                                     <span className="truncate">{event.classroomName}</span>
                                   </span>

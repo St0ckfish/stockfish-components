@@ -148,18 +148,17 @@ const TextEditor: React.FC<TextEditorProps> = ({
 
 
   const wrapSelectionWithTag = (tagName: string) => {
+    if (!editorRef.current) return;
+    
     const selection = window.getSelection();
-
+    
     if (selection && selection.rangeCount > 0) {
       const range = selection.getRangeAt(0);
 
-      if (
-        editorRef.current &&
-        editorRef.current.contains(range.commonAncestorContainer)
-      ) {
+      if (editorRef.current.contains(range.commonAncestorContainer)) {
         const parentElement = range.commonAncestorContainer.parentElement;
+        
         if (parentElement && parentElement.tagName.toLowerCase() === tagName.toLowerCase()) {
-
           const parent = parentElement.parentNode;
           if (parent) {
             while (parentElement.firstChild) {
@@ -168,7 +167,8 @@ const TextEditor: React.FC<TextEditorProps> = ({
             parent.removeChild(parentElement);
           }
         } else {
-          const newNode = document.createElement(tagName);
+          if (!range.collapsed) {
+            const newNode = document.createElement(tagName);
             newNode.appendChild(range.extractContents());
             range.insertNode(newNode);
 
@@ -176,11 +176,37 @@ const TextEditor: React.FC<TextEditorProps> = ({
             const newRange = document.createRange();
             newRange.selectNodeContents(newNode);
             selection.addRange(newRange);
+          } else {
+            const newNode = document.createElement(tagName);
+            newNode.innerHTML = '&#8203;';
+            range.insertNode(newNode);
+            
+            const newRange = document.createRange();
+            newRange.selectNodeContents(newNode);
+            newRange.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(newRange);
+          }
         }
 
         handleChange();
         updateFormattingState();
       }
+    } else {
+      editorRef.current.focus();
+      const newNode = document.createElement(tagName);
+      newNode.innerHTML = '&#8203;';
+      editorRef.current.appendChild(newNode);
+      
+      const newRange = document.createRange();
+      const newSelection = window.getSelection();
+      newRange.selectNodeContents(newNode);
+      newRange.collapse(true);
+      newSelection?.removeAllRanges();
+      newSelection?.addRange(newRange);
+      
+      handleChange();
+      updateFormattingState();
     }
   };
 
@@ -295,20 +321,26 @@ const TextEditor: React.FC<TextEditorProps> = ({
   };
 
   const insertBlockquote = () => {
+    if (!editorRef.current) return;
+    
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
       const range = selection.getRangeAt(0);
-      if (
-        editorRef.current &&
-        editorRef.current.contains(range.commonAncestorContainer)
-      ) {
+      
+      if (editorRef.current.contains(range.commonAncestorContainer)) {
         const blockquoteElement = document.createElement("blockquote");
         blockquoteElement.style.borderLeft = "4px solid #3b82f6";
         blockquoteElement.style.paddingLeft = "16px";
         blockquoteElement.style.margin = "16px 0";
         blockquoteElement.style.fontStyle = "italic";
         blockquoteElement.style.color = "#6b7280";
-        blockquoteElement.appendChild(range.extractContents());
+        
+        if (!range.collapsed) {
+          // There's selected text
+          blockquoteElement.appendChild(range.extractContents());
+        } else {
+          blockquoteElement.innerHTML = "Quote text here...";
+        }
 
         range.deleteContents();
         range.insertNode(blockquoteElement);
@@ -320,18 +352,76 @@ const TextEditor: React.FC<TextEditorProps> = ({
 
         handleChange();
       }
+    } else {
+      editorRef.current.focus();
+      const blockquoteElement = document.createElement("blockquote");
+      blockquoteElement.style.borderLeft = "4px solid #3b82f6";
+      blockquoteElement.style.paddingLeft = "16px";
+      blockquoteElement.style.margin = "16px 0";
+      blockquoteElement.style.fontStyle = "italic";
+      blockquoteElement.style.color = "#6b7280";
+      blockquoteElement.innerHTML = "Quote text here...";
+      
+      editorRef.current.appendChild(blockquoteElement);
+      
+      const newRange = document.createRange();
+      const newSelection = window.getSelection();
+      newRange.selectNodeContents(blockquoteElement);
+      newSelection?.removeAllRanges();
+      newSelection?.addRange(newRange);
+      
+      handleChange();
     }
   };
 
   const changeFontSize = (size: string) => {
+    if (!editorRef.current) return;
+    
+    editorRef.current.focus();
+    
+    if (editorRef.current.innerHTML.trim() === '') {
+      editorRef.current.innerHTML = '<span>Text</span>';
+      const range = document.createRange();
+      const selection = window.getSelection();
+      range.selectNodeContents(editorRef.current.firstChild!);
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+    }
+    
     applyFormat("fontSize", size);
   };
 
   const changeFontColor = (color: string) => {
+    if (!editorRef.current) return;
+    
+    editorRef.current.focus();
+    
+    if (editorRef.current.innerHTML.trim() === '') {
+      editorRef.current.innerHTML = '<span>Text</span>';
+      const range = document.createRange();
+      const selection = window.getSelection();
+      range.selectNodeContents(editorRef.current.firstChild!);
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+    }
+    
     applyFormat("foreColor", color);
   };
 
   const changeBackgroundColor = (color: string) => {
+    if (!editorRef.current) return;
+    
+    editorRef.current.focus();
+    
+    if (editorRef.current.innerHTML.trim() === '') {
+      editorRef.current.innerHTML = '<span>Text</span>';
+      const range = document.createRange();
+      const selection = window.getSelection();
+      range.selectNodeContents(editorRef.current.firstChild!);
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+    }
+    
     applyFormat("hiliteColor", color);
   };
 
@@ -414,10 +504,32 @@ const TextEditor: React.FC<TextEditorProps> = ({
   const applyFormat = (command: string, value: any = null) => {
     if (disabled) return;
     
-      document.execCommand(command, false, value);
-      handleChange();
-      updateFormattingState();
-
+    if (!editorRef.current) return;
+    
+    editorRef.current.focus();
+    
+    if (command.startsWith('justify') && editorRef.current.innerHTML.trim() === '') {
+      editorRef.current.innerHTML = '<div><br></div>';
+      const range = document.createRange();
+      const selection = window.getSelection();
+      range.selectNodeContents(editorRef.current.firstChild!);
+      range.collapse(true);
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+    }
+    
+    if ((command === 'insertOrderedList' || command === 'insertUnorderedList') && editorRef.current.innerHTML.trim() === '') {
+      editorRef.current.innerHTML = '<div>List item</div>';
+      const range = document.createRange();
+      const selection = window.getSelection();
+      range.selectNodeContents(editorRef.current.firstChild!);
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+    }
+    
+    document.execCommand(command, false, value);
+    handleChange();
+    updateFormattingState();
   };
 
   const updateFormattingState = () => {
@@ -628,6 +740,19 @@ const TextEditor: React.FC<TextEditorProps> = ({
             {allowedFormats.headings && (
               <select
                 onChange={e => {
+                  if (!editorRef.current) return;
+                  
+                  editorRef.current.focus();
+                  
+                  if (editorRef.current.innerHTML.trim() === '') {
+                    editorRef.current.innerHTML = '<div>Heading text</div>';
+                    const range = document.createRange();
+                    const selection = window.getSelection();
+                    range.selectNodeContents(editorRef.current.firstChild!);
+                    selection?.removeAllRanges();
+                    selection?.addRange(range);
+                  }
+                  
                   applyFormat("formatBlock", e.target.value);
                 }}
                 disabled={disabled}
@@ -646,7 +771,22 @@ const TextEditor: React.FC<TextEditorProps> = ({
             
             {allowedFormats.fontSize && (
               <select
-                onChange={e => changeFontSize(e.target.value)}
+                onChange={e => {
+                  if (!editorRef.current) return;
+                  
+                  editorRef.current.focus();
+                  
+                  if (editorRef.current.innerHTML.trim() === '') {
+                    editorRef.current.innerHTML = '<span>Text</span>';
+                    const range = document.createRange();
+                    const selection = window.getSelection();
+                    range.selectNodeContents(editorRef.current.firstChild!);
+                    selection?.removeAllRanges();
+                    selection?.addRange(range);
+                  }
+                  
+                  changeFontSize(e.target.value);
+                }}
                 disabled={disabled}
                 className={cn(
                   "rounded px-2 py-1 text-sm border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500",
@@ -1040,7 +1180,22 @@ const TextEditor: React.FC<TextEditorProps> = ({
                 <div className="relative group">
                   <input
                     type="color"
-                    onChange={e => changeFontColor(e.target.value)}
+                    onChange={e => {
+                      if (!editorRef.current) return;
+                      
+                      editorRef.current.focus();
+                      
+                      if (editorRef.current.innerHTML.trim() === '') {
+                        editorRef.current.innerHTML = '<span>Text</span>';
+                        const range = document.createRange();
+                        const selection = window.getSelection();
+                        range.selectNodeContents(editorRef.current.firstChild!);
+                        selection?.removeAllRanges();
+                        selection?.addRange(range);
+                      }
+                      
+                      changeFontColor(e.target.value);
+                    }}
                     disabled={disabled}
                     aria-label="Font color"
                     className={cn(
@@ -1055,7 +1210,22 @@ const TextEditor: React.FC<TextEditorProps> = ({
                 <div className="relative group">
                   <input
                     type="color"
-                    onChange={e => changeBackgroundColor(e.target.value)}
+                    onChange={e => {
+                      if (!editorRef.current) return;
+                      
+                      editorRef.current.focus();
+                      
+                      if (editorRef.current.innerHTML.trim() === '') {
+                        editorRef.current.innerHTML = '<span>Text</span>';
+                        const range = document.createRange();
+                        const selection = window.getSelection();
+                        range.selectNodeContents(editorRef.current.firstChild!);
+                        selection?.removeAllRanges();
+                        selection?.addRange(range);
+                      }
+                      
+                      changeBackgroundColor(e.target.value);
+                    }}
                     disabled={disabled}
                     aria-label="Background color"
                     className={cn(
